@@ -525,3 +525,60 @@ require get_parent_theme_file_path( '/inc/customizer.php' );
  * SVG icons functions and filters.
  */
 require get_parent_theme_file_path( '/inc/icon-functions.php' );
+
+/**
+ * Allow svg media file
+ */
+
+function cc_mime_types($mimes) {
+    $mimes['svg'] = 'image/svg+xml';
+    return $mimes;
+}
+add_filter('upload_mimes', 'cc_mime_types');
+
+/**
+ * Added hook for custom javascript
+ */
+
+function wpb_hook_javascript() {
+    ?>
+    <script type="text/javascript">
+        // function to add the class on mousehover
+        function addClass(element, nameOfClass) {
+            if (element.classList) {
+                element.classList.add(nameOfClass);
+            }
+            else {
+                var regExp = new RegExp('(\\s|^)' + nameOfClass + '(\\s|$)');
+                if (!element.className.match(regExp)) {
+                    element.className += " " + nameOfClass;
+                }
+            }
+        }
+        // function to to remove the class on mouseout
+        function removeClass(element, nameOfClass) {
+            if (element.classList) {
+                element.classList.remove(nameOfClass);
+            }
+            else {
+                var regExp = new RegExp('(\\s|^)' + nameOfClass + '(\\s|$)');
+                if (element.className.match(regExp)) {
+                    element.className.replace(regExp, ' ');
+                }
+            }
+        }
+
+        /* Lazy loading js */
+        window.addEventListener('load', function(){
+            var allimages= document.getElementsByClassName('lazy');
+            for (var i=0; i<allimages.length; i++) {
+                if (allimages[i].getAttribute('data-src')) {
+                    allimages[i].setAttribute('src', allimages[i].getAttribute('data-src'));
+                }
+            }
+        }, false)
+        // end of lazy loading js script
+    </script>
+    <?php
+}
+add_action('wp_head', 'wpb_hook_javascript');
